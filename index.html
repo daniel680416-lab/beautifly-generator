@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAUTIFLY 商品內頁文案與版型生成工具 (官網原版 1:1 精準版)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=Noto+Serif+TC:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bf-ivory: #FBF8F4;
+      --bf-paper: #FFFFFF;
+      --bf-mist: #F4F0EA;
+      --bf-line: #E7DED4;
+      --bf-charcoal: #252525;
+      --bf-text: #3A3733;
+      --bf-muted: #746D66;
+      --bf-taupe: #6B5E54;
+      --bf-gold: #9A7B52;
+      --bf-sage: #8E9B8A;
+      --bf-border: #E0D7CC;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #F7F5F0;
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--bf-text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--bf-line);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-title {
+      font-family: 'Noto Serif TC', serif;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--bf-charcoal);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-env {
+      font-size: 11px;
+      font-family: sans-serif;
+      background: var(--bf-mist);
+      color: var(--bf-taupe);
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid var(--bf-line);
+      letter-spacing: 0.05em;
+    }
+
+    .main-container {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      height: calc(100vh - 61px);
+      overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+      }
+    }
+
+    /* 左側輸入控制面板 */
+    .control-panel {
+      background: #FFFFFF;
+      border-right: 1px solid var(--bf-line);
+      padding: 22px 26px;
+      overflow-y: auto;
+      height: 100%;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--bf-charcoal);
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 14px;
+      border: 1px solid var(--bf-border);
+      border-radius: 4px;
+      background: #FAF8F5;
+      color: var(--bf-text);
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--bf-taupe);
+      background: #FFFFFF;
+      box-shadow: 0 0 0 2px rgba(107, 94, 84, 0.12);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 60px;
+      line-height: 1.5;
+    }
+
+    .section-divider {
+      border: 0;
+      height: 1px;
+      background: var(--bf-line);
+      margin: 22px 0 18px 0;
+    }
+
+    .panel-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--bf-charcoal);
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* 尺寸表輸入小工具 (全自由編輯版) */
+    .size-table-container {
+      overflow-x: auto;
+      border: 1px solid var(--bf-line);
+      border-radius: 4px;
+      margin-top: 8px;
+      background: #FFFFFF;
+    }
+
+    .size-table-input {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 320px;
+    }
+
+    .size-table-input th {
+      background: var(--bf-mist);
+      border: 1px solid var(--bf-line);
+      padding: 4px 6px;
+      font-weight: 500;
+      color: var(--bf-taupe);
+      position: relative;
+    }
+
+    .size-table-input td {
+      border: 1px solid var(--bf-line);
+      padding: 3px 4px;
+      background: #FFFFFF;
+    }
+
+    .size-table-input input {
+      width: 100%;
+      border: 1px solid transparent;
+      padding: 5px 4px;
+      font-size: 12px;
+      text-align: center;
+      background: transparent;
+      outline: none;
+      border-radius: 2px;
+      font-family: inherit;
+    }
+
+    .size-table-input input:focus {
+      border-color: var(--bf-taupe);
+      background: #FAF8F5;
+    }
+
+    .size-table-input th input {
+      font-weight: 600;
+      color: var(--bf-charcoal);
+    }
+
+    .th-header-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .btn-col-del {
+      background: none;
+      border: none;
+      color: #bbb;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      padding: 2px;
+      border-radius: 2px;
+      transition: color 0.15s;
+    }
+    .btn-col-del:hover { color: #d9534f; }
+
+    .btn-row-action {
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+    }
+    .btn-row-action:hover { color: #d9534f; }
+
+    /* 按鈕樣式 */
+    .btn-generate {
+      width: 100%;
+      padding: 13px;
+      background: var(--bf-charcoal);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-generate:hover {
+      background: var(--bf-taupe);
+    }
+
+    .btn-outline-sm {
+      background: #FFFFFF;
+      border: 1px solid var(--bf-line);
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      color: var(--bf-taupe);
+    }
+    .btn-outline-sm:hover {
+      background: var(--bf-mist);
+    }
+
+    /* 右側預覽與複製輸出面板 */
+    .preview-panel {
+      padding: 22px 28px;
+      overflow-y: auto;
+      height: 100%;
+      background: #F4F1EA;
+    }
+
+    .copy-box-group {
+      background: #FFFFFF;
+      border: 1px solid var(--bf-line);
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    }
+
+    .copy-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .copy-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--bf-charcoal);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .copy-desc {
+      font-size: 12px;
+      color: var(--bf-muted);
+      margin-bottom: 10px;
+    }
+
+    .btn-copy {
+      background: var(--bf-sage);
+      color: #FFFFFF;
+      border: none;
+      padding: 7px 18px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn-copy:hover {
+      opacity: 0.9;
+    }
+
+    .btn-copy.copied {
+      background: #4a7c59;
+    }
+
+    .code-preview-area {
+      width: 100%;
+      height: 130px;
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 12px;
+      background: #252525;
+      color: #E2E8F0;
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid #333;
+      resize: vertical;
+      white-space: pre;
+    }
+
+    /* 模擬 Gogoshop 手機 / 電腦預覽框 */
+    .preview-viewport-toggle {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .preview-viewport-toggle button {
+      background: #FFFFFF;
+      border: 1px solid var(--bf-line);
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--bf-taupe);
+    }
+
+    .preview-viewport-toggle button.active {
+      background: var(--bf-taupe);
+      color: #FFFFFF;
+      border-color: var(--bf-taupe);
+    }
+
+    .live-render-box {
+      background: #FFFFFF;
+      border: 1px solid var(--bf-line);
+      border-radius: 6px;
+      padding: 24px;
+      margin: 0 auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      transition: max-width 0.3s ease;
+    }
+
+    .live-render-box.desktop-view {
+      max-width: 760px;
+    }
+
+    .live-render-box.mobile-view {
+      max-width: 390px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      BEAUTIFLY
+      <span class="badge-env">官網原版 1:1 排版生成器 v2.0</span>
+    </div>
+    <div style="font-size: 13px; color: var(--bf-muted);">
+      原版三宮格規格 · 橫向尺寸表 · 米杏雙欄保養出貨 · 直式防變形圖文
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- 左側：輸入表單 -->
+    <div class="control-panel">
+      
+      <div class="form-group">
+        <label for="productCategory">1. 選擇商品種類</label>
+        <select id="productCategory" class="form-control" onchange="onCategoryChange()">
+          <option value="sports_bra" selected>運動內衣 (Sports Bra)</option>
+          <option value="top">上衣 (Tops / 罩杯上衣 / 瑜珈長短袖)</option>
+          <option value="leggings">瑜珈褲 (Leggings / 緊身褲 / 喇叭褲)</option>
+          <option value="set">套裝 (Sets / 兩件式運動套裝)</option>
+          <option value="outerwear">罩衫外套 (Outerwear / 防曬外套)</option>
+          <option value="accessories">瑜珈配件 (Accessories)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="productName">2. 商品完整名稱</label>
+        <input type="text" id="productName" class="form-control" value="深V線條運動內衣" oninput="onProductNameInput()">
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label for="designStyle" style="margin-bottom: 0;">3. 設計剪裁 / 風格特徵</label>
+          <span style="font-size: 11px; color: var(--bf-sage);">⚡ 依品名自動判斷或手動切換</span>
+        </div>
+        <select id="designStyle" class="form-control" onchange="onStyleChange()">
+          <!-- 依商品種類動態載入風格選項 -->
+        </select>
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label for="productSlogan" style="margin-bottom: 0;">4. 頂部主標語情境短文 (560px 置中引言)</label>
+          <button type="button" class="btn-outline-sm" onclick="regenerateSlogan()" style="padding: 2px 8px; font-size: 11px;">🔄 換一句</button>
+        </div>
+        <textarea id="productSlogan" class="form-control" rows="3"></textarea>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="panel-section-title">
+        <span>4. 三宮格核心亮點 (Support / Fabric / Design)</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+        <input type="text" id="cardTag1" class="form-control" placeholder="英文標 1" value="Support">
+        <input type="text" id="cardTag2" class="form-control" placeholder="英文標 2" value="Fabric">
+        <input type="text" id="cardTag3" class="form-control" placeholder="英文標 3" value="Design">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+        <input type="text" id="cardTitle1" class="form-control" placeholder="中文標 1" value="穩定包覆">
+        <input type="text" id="cardTitle2" class="form-control" placeholder="中文標 2" value="親膚高彈">
+        <input type="text" id="cardTitle3" class="form-control" placeholder="中文標 3" value="斜肩網紗">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+        <textarea id="cardDesc1" class="form-control" rows="3" placeholder="描述 1">可拆式胸墊設計，提供中低強度運動所需的舒適支撐。</textarea>
+        <textarea id="cardDesc2" class="form-control" rows="3" placeholder="描述 2">柔軟貼膚、彈性延展，動作轉換時依然自在不緊繃。</textarea>
+        <textarea id="cardDesc3" class="form-control" rows="3" placeholder="描述 3">不對稱剪裁修飾肩頸線條，細節精緻而不過度張揚。</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="productSpecs">5. 商品資訊規格清單 (左標題:右內容，每行一筆)</label>
+        <textarea id="productSpecs" class="form-control" rows="5">適合場景: 瑜珈、皮拉提斯、伸展、輕訓、日常外出
+支撐程度: 中低強度支撐
+胸墊設計: 可拆式胸墊
+版型感受: 貼身包覆，建議依平常運動內衣尺寸選購
+彈性程度: 高彈</textarea>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="panel-section-title">
+        <span>6. 尺寸參考表 (欄位、尺碼與數值皆可點選自由修改)</span>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="btn-outline-sm" onclick="addColumn()">+ 新增尺碼欄 (如: XL)</button>
+          <button type="button" class="btn-outline-sm" onclick="addMetricRow()">+ 新增指標列 (如: 腰圍)</button>
+        </div>
+      </div>
+      <div class="size-table-container">
+        <table class="size-table-input" id="sizeTableInput">
+          <thead>
+            <tr id="sizeTableHeaders">
+              <!-- 動態生成表頭 -->
+            </tr>
+          </thead>
+          <tbody id="sizeTableBody">
+            <!-- 動態生成表格列 -->
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="panel-section-title">
+        <span>7. 商品內文直式圖片 (等比例防拉伸)</span>
+        <button type="button" class="btn-outline-sm" onclick="addImageField()">+ 新增圖片</button>
+      </div>
+      <div id="imageInputsContainer">
+        <div class="form-group" style="margin-bottom: 8px;">
+          <input type="text" class="form-control image-url-input" placeholder="圖片網址 1 (例: https://storage.googleapis.com/...)" value="https://storage.googleapis.com/img.gogoshop.cloud/ce876206/0w-A06drYka.jpg">
+        </div>
+        <div class="form-group" style="margin-bottom: 8px;">
+          <input type="text" class="form-control image-url-input" placeholder="圖片網址 2" value="https://storage.googleapis.com/img.gogoshop.cloud/ce876206/sZ8A0aZrYka.jpg">
+        </div>
+        <div class="form-group" style="margin-bottom: 8px;">
+          <input type="text" class="form-control image-url-input" placeholder="圖片網址 3" value="https://storage.googleapis.com/img.gogoshop.cloud/ce876206/Yq1A0qLrYka.jpg">
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <button type="button" class="btn-generate" onclick="generateAll()">⚡ 產生 HTML 代碼與即時預覽</button>
+      
+    </div>
+
+    <!-- 右側：代碼複製與即時預覽 -->
+    <div class="preview-panel">
+      
+      <!-- 輸出 1：商品特性 -->
+      <div class="copy-box-group">
+        <div class="copy-header">
+          <div>
+            <div class="copy-title">
+              📋 輸出欄位 1：商品特性 (100% 官網原版排版結構)
+            </div>
+            <div class="copy-desc">
+              包含：頂部大標與詩意短引言、三宮格卡片(Support/Fabric/Design)、兩端對齊商品資訊清單、橫向尺寸參考表、米杏色雙欄保養與出貨 (至此結束)
+            </div>
+          </div>
+          <button class="btn-copy" onclick="copyCode('featureCodeArea', this)">複製代碼</button>
+        </div>
+        <textarea id="featureCodeArea" class="code-preview-area" readonly></textarea>
+      </div>
+
+      <!-- 輸出 2：商品內文 -->
+      <div class="copy-box-group">
+        <div class="copy-header">
+          <div>
+            <div class="copy-title">
+              🖼️ 輸出欄位 2：商品內文 (Full Story & Gallery)
+            </div>
+            <div class="copy-desc">
+              包含：主圖直式防拉伸排版、FABRIC DETAIL 裸感面料細節解析、生活理念結語、多角度實穿圖
+            </div>
+          </div>
+          <button class="btn-copy" onclick="copyCode('storyCodeArea', this)">複製代碼</button>
+        </div>
+        <textarea id="storyCodeArea" class="code-preview-area" readonly></textarea>
+      </div>
+
+      <!-- 即時畫面預覽 -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; margin-bottom: 12px;">
+        <span style="font-size: 15px; font-weight: 600; color: var(--bf-charcoal);">👀 所見即所得即時預覽效果 (官網同款實測)</span>
+        <div class="preview-viewport-toggle">
+          <button type="button" class="active" onclick="switchView('desktop')">電腦版 (760px)</button>
+          <button type="button" onclick="switchView('mobile')">手機版 (390px)</button>
+        </div>
+      </div>
+
+      <div class="live-render-box desktop-view" id="liveRenderContainer">
+        <!-- 即時渲染內容會注入在此 -->
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // 預設各品類及其細分風格資料庫
+    const categoryTemplates = {
+      sports_bra: {
+        styles: [
+          {
+            id: "deep_v",
+            name: "深V / 鎖骨美胸線條",
+            keywords: ["深v", "深 v", "v領", "v 領", "美胸", "鎖骨", "線條"],
+            slogans: [
+              "以簡潔深 V 剪裁帶出上身比例，兼具包覆感與精緻感。單穿、內搭或搭配外套，都能展現乾淨的運動生活風格。",
+              "流暢俐落的深 V 輪廓，自然拉長頸部與鎖骨線條。高回彈穩定支撐，在每一次呼吸伸展中展現自信姿態。",
+              "微露鎖骨的優雅深 V 線條，搭配平整無痕下圍。提供恰如其分的溫柔包覆，兼具日常穿搭的美感與運動機能。"
+            ],
+            cards: [
+              { tag: "Support", title: "鎖骨修飾", desc: "深 V 線條拉開上身視覺，讓身形比例更顯輕盈優雅。" },
+              { tag: "Fabric", title: "穩定穿著", desc: "貼合胸型並保有彈性，提供日常與運動的舒適支撐。" },
+              { tag: "Design", title: "輕奢內搭", desc: "可作為運動內衣，也適合直接搭配西裝或開襟外套。" }
+            ],
+            storyHeroTag: "DAILY PRACTICE",
+            storyHeroTitle: "深 V 輪廓，讓線條更輕盈",
+            storyHeroDesc: "以簡潔深 V 剪裁帶出上身比例，兼具包覆感與精緻感。單穿、內搭或搭配外套，都能展現乾淨的運動生活風格。",
+            closingTitle: "一件，從練習到生活",
+            closingDesc: "讓運動服飾不只存在於練習時刻，也能成為日常穿搭的一部分。以乾淨深 V 剪裁兼具包覆與舒適，是 BEAUTIFLY 對輕奢生活的美學堅持。"
+          },
+          {
+            id: "one_shoulder",
+            name: "斜肩 / 不對稱剪裁",
+            keywords: ["斜肩", "不對稱", "單肩", "斜邊"],
+            slogans: [
+              "以不對稱肩線與細緻剪裁，勾勒俐落身形。親膚高彈面料帶來穩定包覆，適合瑜珈、皮拉提斯、輕訓與日常穿搭。",
+              "斜肩微露的從容，承載練習時的輕盈專注。一體成型的俐落線條，兼顧安全包覆與獨特設計美感。"
+            ],
+            cards: [
+              { tag: "Support", title: "穩定包覆", desc: "加寬側邊與可拆式胸墊，提供中低強度運動的舒適支撐。" },
+              { tag: "Fabric", title: "親膚高彈", desc: "柔軟貼膚、彈性延展，動作轉換時依然自在不緊繃。" },
+              { tag: "Design", title: "斜肩美背", desc: "不對稱剪裁修飾肩頸線條，細節精緻而不過度張揚。" }
+            ],
+            storyHeroTag: "ASYMMETRIC",
+            storyHeroTitle: "斜肩俐落，演繹不對稱美學",
+            storyHeroDesc: "打破傳統對稱框架，以單邊斜肩線條展現優雅鎖骨。高彈親膚面料提供安心包覆，隨心穿梭練習與街頭。",
+            closingTitle: "不對稱中的平衡之美",
+            closingDesc: "在打破常規的斜肩線條中，尋找身體與心靈的專注平衡。一件兼具設計感與支撐力的單品，伴妳自在展開動靜日常。"
+          },
+          {
+            id: "cross_back",
+            name: "美背 / 細帶交叉美背",
+            keywords: ["美背", "交叉", "細帶", "鏤空", "背帶", "大露背", "挖背"],
+            slogans: [
+              "背部交錯的纖細線條，分擔肩部壓力的同時勾勒優雅蝴蝶骨。高彈貼合不勒肉，轉身盡顯迷人細節。",
+              "立體美背多帶結構，將力量與優雅完美融合。透氣減壓設計，陪伴您自在完成每一個後彎與延展。"
+            ],
+            cards: [
+              { tag: "Support", title: "減壓分力", desc: "多帶交叉結構均勻分散肩部壓力，久穿依然輕鬆舒適。" },
+              { tag: "Fabric", title: "吸濕快乾", desc: "後背大面積透氣散熱，運動暴汗依然保持清爽不黏膩。" },
+              { tag: "Design", title: "優雅美背", desc: "交織線條勾勒肩胛蝴蝶骨曲線，外露穿搭更顯精緻細節。" }
+            ],
+            storyHeroTag: "BEAUTIFUL BACK",
+            storyHeroTitle: "交疊美背，定格轉身時的優雅",
+            storyHeroDesc: "精巧的後背交叉設計，不只為運動分擔受力，更讓背影成為最美的風景。輕盈裸感，自在舒展無束縛。",
+            closingTitle: "自信轉身，綻放背影的優雅力量",
+            closingDesc: "細緻線條交錯出無與倫比的視覺美感，讓每次深呼吸與延展，都充滿從容自得的女性力量。"
+          },
+          {
+            id: "high_neck",
+            name: "削肩 / 工字背高包覆",
+            keywords: ["削肩", "工字", "高領", "防震", "包覆", "支撐", "高強度", "防下垂"],
+            slogans: [
+              "俐落削肩微高領剪裁，提供絕佳的安全感與防走光防護。加寬彈力下圍牢牢鎖定胸型，無畏大幅度跳動。",
+              "極簡俐落的工字背廓形，完全釋放肩胛活動度。高支撐高包覆結構，無論跑步重訓皆能穩定承托。"
+            ],
+            cards: [
+              { tag: "Support", title: "全面防護", desc: "削肩高包覆剪裁防走光，大動作倒立前屈也能安心自在。" },
+              { tag: "Fabric", title: "抗震穩定", desc: "緊密高彈機能織法，大幅減緩晃動並提供穩定托舉。" },
+              { tag: "Design", title: "修飾副乳", desc: "加高側邊弧度自然包覆副乳，營造平整俐落的側身輪廓。" }
+            ],
+            storyHeroTag: "HIGH SUPPORT",
+            storyHeroTitle: "全面包覆，無畏躍動的強大後盾",
+            storyHeroDesc: "以極致的防震穩定結構與加寬工字背剪裁，守護高強度運動的每一個瞬間。安心鎖定，無拘無束。",
+            closingTitle: "堅定支撐，為每一次躍動注入信心",
+            closingDesc: "專為追求極致穩定與安全感而生。貼合胸型、減震防移位，陪伴妳勇敢挑戰每一個更強大的自己。"
+          },
+          {
+            id: "classic",
+            name: "經典基礎 / 雲感裸感必備",
+            keywords: ["雲感", "裸感", "基礎", "經典", "素面", "無痕", "日常"],
+            slogans: [
+              "以極簡純粹的日常剪裁回歸穿著本身。四向柔糯高回彈面料如同第二層肌膚，帶來全天候零壓迫的輕盈陪伴。",
+              "沒有多餘贅飾，只有剛剛好的柔糯包覆。無論居家休閒、瑜珈練習或日常通勤打底，皆是衣櫥不可或缺的舒適基石。"
+            ],
+            cards: [
+              { tag: "Support", title: "柔和承托", desc: "適配日常中低強度練習，提供溫柔不緊繃的包覆支撐。" },
+              { tag: "Fabric", title: "裸感親膚", desc: "細膩啞光磨毛觸感，如同第二層肌膚般貼合無感。" },
+              { tag: "Design", title: "極簡百搭", desc: "經典簡潔輪廓，輕鬆融入日常各式風格的層次穿搭。" }
+            ],
+            storyHeroTag: "SECOND SKIN",
+            storyHeroTitle: "雲感裸膚，零束縛的日常陪伴",
+            storyHeroDesc: "極致親膚的面料與乾淨剪裁，帶來身心共鳴的輕盈體驗。穿上它，享受一整天自在深呼吸的美好。",
+            closingTitle: "純粹初心，回歸最真實的穿著體感",
+            closingDesc: "洗盡繁複，留下最本質的觸感與包覆。讓運動內衣成為身體的自然延伸，溫柔守護日常每一刻。"
+          }
+        ],
+        specs: "適合場景: 瑜珈、皮拉提斯、伸展、輕訓、日常外出\n支撐程度: 中低強度支撐\n胸墊設計: 可拆式胸墊\n版型感受: 貼身包覆，建議依平常運動內衣尺寸選購\n彈性程度: 高彈",
+        sizeMetrics: [
+          { name: "胸圍", s: "68", m: "72", l: "76" },
+          { name: "下擺圍", s: "58", m: "62", l: "66" },
+          { name: "衣長", s: "30", m: "31", l: "32" }
+        ]
+      },
+      top: {
+        styles: [
+          {
+            id: "loose_flow",
+            name: "寬鬆垂墜 / 罩衫",
+            keywords: ["寬鬆", "罩衫", "垂墜", "長版", "微鬆", "慵懶"],
+            slogans: [
+              "細緻垂墜感微涼面料，為練習與日常描繪從容輪廓。兼具親膚透氣與修身立體感，隨心延伸動靜日常。",
+              "自帶鬆弛感的微鬆版型，隨風擺動流露優雅氛圍。運動後隨手一披，輕鬆遮飾身形兼顧微保暖。"
+            ],
+            cards: [
+              { tag: "Fit", title: "微鬆修身", desc: "自然垂墜圓弧下擺，修飾側身與腰腹優雅線條。" },
+              { tag: "Airy", title: "透氣排汗", desc: "細膩排汗織法，長時間運動保持乾爽不黏身。" },
+              { tag: "Versatile", title: "動靜百搭", desc: "練習時的輕量外罩，也是都會通勤的質感打底。" }
+            ],
+            storyHeroTag: "AIRY TEXTURE",
+            storyHeroTitle: "柔糯親膚，自由呼吸的空氣感",
+            storyHeroDesc: "擺脫束縛感，以輕盈且具懸垂感的質地溫柔包覆。無論是大汗淋漓的練習，還是悠然午後的漫步，都能感受肌膚呼吸的自在。",
+            closingTitle: "輕柔相伴，穿梭隨性與優雅之間",
+            closingDesc: "一件上衣，多種可能。在運動流汗的釋放與都會漫步的休閒中，自如切換專屬於妳的鬆弛美學。"
+          },
+          {
+            id: "built_in_bra",
+            name: "自帶胸墊 / 一體式Bra上衣",
+            keywords: ["胸墊", "一體", "背心", "bra", "免穿內衣", "短袖", "長袖"],
+            slogans: [
+              "自帶可拆卸透氣胸墊，一件搞定上身穿搭免去層疊悶熱。貼合身體曲度，展現流暢修長的挺拔線條。",
+              "免穿運動內衣的一體式聰明設計，享受零壓迫的無痕貼合。下課後外搭一件西裝，隨即俐落赴約。"
+            ],
+            cards: [
+              { tag: "Comfort", title: "免穿內衣", desc: "內建穩定胸墊杯結構，單穿俐落不走光，告別多層勒痕。" },
+              { tag: "Support", title: "修身顯瘦", desc: "立體修身剪裁收腰顯瘦，自然勾勒女性優雅曲線。" },
+              { tag: "Fabric", title: "高彈親膚", desc: "四向拉伸柔糯面料，大動作延展依然服貼不移位。" }
+            ],
+            storyHeroTag: "EFFORTLESS",
+            storyHeroTitle: "一件出門，從容享受一體式輕盈",
+            storyHeroDesc: "融合運動內衣的承托與上衣的修身剪裁，一件即是完整的優雅。省去內搭繁瑣，回歸純粹的自由。",
+            closingTitle: "減去繁複，以一件式的簡約定義日常",
+            closingDesc: "拋開內衣束縛與多層疊穿的悶熱，回歸最俐落自若的穿著姿態，由內而外綻放舒適自信。"
+          },
+          {
+            id: "crop_top",
+            name: "短版露腰 / 修身T恤",
+            keywords: ["短版", "露腰", "修身", "緊身", "短t", "短版上衣"],
+            slogans: [
+              "黃金比例短版長度，巧妙落在腰部最纖細處，拉長雙腿視覺比例。貼身高彈面料，動作間毫不拖泥帶水。",
+              "俐落微短版剪裁，搭配高腰瑜珈褲打造九頭身體態。輕薄速乾透氣織理，運動出汗依然乾爽。"
+            ],
+            cards: [
+              { tag: "Proportion", title: "拉長比例", desc: "剛好微露腹部線條，向上提拉腰線打造高挑視覺效果。" },
+              { tag: "Fit", title: "貼身顯瘦", desc: "立體修身剪裁勾勒腰腹線條，動作到位不鬆垮。" },
+              { tag: "Fabric", title: "速乾透氣", desc: "透氣微孔纖維快速導出汗水熱氣，練習全程舒適自在。" }
+            ],
+            storyHeroTag: "PROPORTION",
+            storyHeroTitle: "精準短版，重塑高挑黃金比例",
+            storyHeroDesc: "俐落的短版剪裁，讓雙腿線條延伸無盡。運動時俐落無拘束，展現充滿力量的活力曲線。",
+            closingTitle: "俐落剪裁，釋放青春與修長身形",
+            closingDesc: "恰到好處的露腰長度，重塑視覺重心。無論搭配緊身褲或工裝褲，都能展現充滿活力的輕奢運動風。"
+          }
+        ],
+        specs: "適合場景: 慢跑、皮拉提斯、休閒、日常通勤\n透氣指數: 極佳微涼感\n版型感受: 微寬鬆自然垂墜\n彈性程度: 中高彈力\n保養方式: 水洗不易起毛球",
+        sizeMetrics: [
+          { name: "胸圍", s: "88", m: "92", l: "96" },
+          { name: "衣長", s: "54", m: "56", l: "58" },
+          { name: "袖長", s: "58", m: "59", l: "60" }
+        ]
+      },
+      leggings: {
+        styles: [
+          {
+            id: "seamless_high_waist",
+            name: "無尷尬線 / 高腰提臀褲",
+            keywords: ["無尷尬線", "高腰", "提臀", "蜜桃臀", "收腹", "緊身褲", "9分", "九分"],
+            slogans: [
+              "無尷尬線剪裁搭配高腰微壓支撐，讓雙腿線條延伸流暢。柔韌高回彈，陪伴每一次深蹲與延展。",
+              "前襠平整一體成型告別顯痕困擾，加寬雙層高腰封平撫小腹。極致裸感緊密包裹，雕塑緊實腿部曲線。"
+            ],
+            cards: [
+              { tag: "Seamless", title: "無尷尬線", desc: "襠部平整一體成型無中縫，大動作練習也安心自在。" },
+              { tag: "Support", title: "高腰微壓", desc: "雙層加寬高腰封，平撫腹部曲線且活動不捲邊。" },
+              { tag: "Sculpt", title: "立體提臀", desc: "背部弧形微笑線剪裁，自然收攏拉提蜜桃臀形。" }
+            ],
+            storyHeroTag: "SECOND SKIN",
+            storyHeroTitle: "無拘無束，塑形於無形之中",
+            storyHeroDesc: "極致細膩的高彈密織面料，深色不透光，宛如第二層肌膚般服貼。每一次延展與深蹲，皆擁有最穩定踏實的安全感。",
+            closingTitle: "無痕包裹，重塑挺拔自信曲線",
+            closingDesc: "讓雙腿在無拘束的高彈包覆中盡情延展。擺脫尷尬線條顧慮，專注於每一次呼吸與肌群發力。"
+          },
+          {
+            id: "flare_pants",
+            name: "微喇叭 / 開叉修腿瑜珈褲",
+            keywords: ["喇叭", "開叉", "微喇", "寬腿", "直筒", "修身褲"],
+            slogans: [
+              "膝下微張的復古微喇輪廓，修飾小腿線條展現筆直長腿。自帶都會優雅氣質，無縫銜接健身房與日常穿搭。",
+              "流暢微喇剪裁拉長身形線條，走動間散發輕盈律動感。舒適高腰微壓包裹，兼具運動機能與街頭時髦度。"
+            ],
+            cards: [
+              { tag: "Elongate", title: "修飾腿型", desc: "微喇弧度巧妙隱藏小腿肌肉，視覺瞬間拉直拉長腿部。" },
+              { tag: "Comfort", title: "高腰收腹", desc: "加寬彈力腰封舒適包覆腰線，久坐不壓迫胃部。" },
+              { tag: "Style", title: "日常百搭", desc: "搭配球鞋、短靴或西裝外套，展現鬆弛高級的 Athleisure 風格。" }
+            ],
+            storyHeroTag: "FLARE SILHOUETTE",
+            storyHeroTitle: "復古微喇，延展無盡修長身形",
+            storyHeroDesc: "從瑜珈墊到都會街角，一條兼具運動機能與時裝輪廓的喇叭長褲。讓身形在動靜步伐中自然舒展。",
+            closingTitle: "步履輕盈，展現長腿與復古時髦",
+            closingDesc: "不只是專業的瑜珈練習褲，更是提升日常比例的時髦單品。行走之間，皆是從容自在的迷人身段。"
+          },
+          {
+            id: "pocket_utility",
+            name: "側口袋 / 戶外機能款",
+            keywords: ["口袋", "側袋", "跑步", "戶外", "登山", "置物"],
+            slogans: [
+              "貼心側置隱形彈力口袋，大螢幕手機與鑰匙小物隨身安放不晃動。高回彈緊密包覆，滿足戶外跑步與中高強度訓練需求。",
+              "結合實用收納與流暢美學的機能瑜珈褲。深層加壓支撐腿部肌群，戶外運動自由奔馳無束縛。"
+            ],
+            cards: [
+              { tag: "Utility", title: "側身口袋", desc: "貼合大腿雙側隱藏口袋，置物穩固貼身運動不滑落。" },
+              { tag: "Support", title: "肌肉包裹", desc: "漸進式分段加壓面料，支撐腿部肌群減緩運動疲累。" },
+              { tag: "Fabric", title: "耐磨抗刮", desc: "高密度耐磨防刮纖維，戶外越野與重訓更安心耐穿。" }
+            ],
+            storyHeroTag: "FUNCTIONAL WEAR",
+            storyHeroTitle: "實用收納，隨心解放雙手奔馳",
+            storyHeroDesc: "為熱愛奔跑與探索的妳而設計。將必備小物隱形收納於身側，讓專注力完全回歸步伐與呼吸。",
+            closingTitle: "輕裝出發，探索身心與戶外邊界",
+            closingDesc: "給雙手徹底的自由，讓收納與機能融為一體。無論在城市步道或山野林間，皆能無拘無束自在前行。"
+          }
+        ],
+        specs: "適合場景: 瑜珈、重訓、深蹲、皮拉提斯、慢跑\n剪裁設計: 前襠無尷尬線剪裁\n腰部設計: 加寬微壓雙層高腰\n版型感受: 緊密包裹提拉，貼身顯瘦\n彈性程度: 四向超高彈",
+        sizeMetrics: [
+          { name: "腰圍", s: "52", m: "56", l: "60" },
+          { name: "臀圍", s: "68", m: "72", l: "76" },
+          { name: "褲長", s: "84", m: "86", l: "88" }
+        ]
+      },
+      set: {
+        styles: [
+          {
+            id: "classic_set",
+            name: "經典成套 / 莫蘭迪同色套裝",
+            keywords: ["套裝", "成套", "兩件", "同色", "兩件套"],
+            slogans: [
+              "省去繁瑣思緒，以整套一致的光澤與親膚張力包覆全身。無論走入教室或漫步街頭，皆展現一氣呵成的優雅氣場。",
+              "同調同色的極簡成套設計，出門免煩惱日常搭配。上下身黃金比例呼應，展現和諧勻稱的自信體態。"
+            ],
+            cards: [
+              { tag: "Harmony", title: "一體比例", desc: "上下身同色同質，拉長視覺比例展現勻稱體態。" },
+              { tag: "Support", title: "平衡支撐", desc: "上身穩定支撐胸型，下身微壓提拉雙腿身形。" },
+              { tag: "Style", title: "都會套裝", desc: "外搭風衣或長版罩衫，快速切換運動與生活模式。" }
+            ],
+            storyHeroTag: "COHESIVE SET",
+            storyHeroTitle: "成套從容，定義全身一致的美學律動",
+            storyHeroDesc: "乾淨俐落的同色系統，免去早晨搭配的猶豫。讓流暢線條包覆身軀，由內而外散發沉靜自信的光采。",
+            closingTitle: "一氣呵成，享受零思考的整套高級感",
+            closingDesc: "極簡同色系打造視覺延伸，省去繁複搭配心力。穿上成套的從容自信，邁向每一個優雅日程。"
+          }
+        ],
+        specs: "適合場景: 瑜珈館、皮拉提斯、成套休閒出鏡、旅行\n組合內容: 上身運動內衣 + 下身高腰緊身褲\n版型感受: 全身勻稱包覆修飾\n彈性程度: 四向高彈力\n色系調性: 溫潤莫蘭迪靜奢同調",
+        sizeMetrics: [
+          { name: "上身胸圍", s: "68", m: "72", l: "76" },
+          { name: "下身腰圍", s: "52", m: "56", l: "60" },
+          { name: "下身褲長", s: "84", m: "86", l: "88" }
+        ]
+      },
+      outerwear: {
+        styles: [
+          {
+            id: "loose_jacket",
+            name: "拉鍊外套 / 短版防風罩衫",
+            keywords: ["外套", "拉鍊", "防風", "夾克", "開襟", "長袖外套"],
+            slogans: [
+              "輕盈抗溫差，為運動前後的身體提供恰到好處的保護。慵懶落肩設計，漫不經心展現高級鬆弛感。",
+              "防風微防潑水輕量質地，運動後拉上拉鍊即可溫柔禦寒。俐落剪裁不臃腫，展現乾淨俐落的運動生活姿態。"
+            ],
+            cards: [
+              { tag: "Light", title: "輕若無物", desc: "極輕薄好折疊收納，隨手置入托特包無負擔。" },
+              { tag: "Defense", title: "防風防曬", desc: "運動後抵禦冷風，戶外活動提供溫和防護。" },
+              { tag: "Silhouette", title: "俐落微短版", desc: "落肩短版設計，拉長下半身雙腿視覺比例。" }
+            ],
+            storyHeroTag: "FLOWING LAYERS",
+            storyHeroTitle: "溫柔覆蓋，隨心穿梭微涼時分",
+            storyHeroDesc: "在動作停歇的片刻，給予體溫最貼心的守護。隨性披上即可出門，詮釋當代女性不費力的運動美學。",
+            closingTitle: "漫不經心，展現從容優雅的層次穿搭",
+            closingDesc: "運動與日常的最佳過渡單品。無論微涼晨曦或冷氣室內，皆能為身心披上一層恰到好處的溫柔防護。"
+          }
+        ],
+        specs: "適合場景: 暖身前後、冷氣房、戶外防曬、晨跑\n材質手感: 爽滑抗皺輕量面料\n細節特色: 拇指孔袖口設計防風滑動\n版型感受: 慵懶落肩微寬鬆",
+        sizeMetrics: [
+          { name: "胸圍", s: "100", m: "104", l: "108" },
+          { name: "衣長", s: "48", m: "50", l: "52" },
+          { name: "袖長", s: "67", m: "68", l: "69" }
+        ]
+      },
+      accessories: {
+        styles: [
+          {
+            id: "yoga_mat",
+            name: "瑜珈墊 / 鋪巾 / 輔具",
+            keywords: ["墊", "瑜珈墊", "輔具", "磚", "帶", "滾筒"],
+            slogans: [
+              "以嚴選環保材質與扎實抓地力，提供深層練習最踏實的依靠。極簡大地色系，融入寧靜日常場域。",
+              "每一次接觸地面的瞬間，都有足夠的厚度與緩衝支撐。防滑耐磨無異味，陪伴您專注於每一次深呼吸。"
+            ],
+            cards: [
+              { tag: "Grip", title: "極致止滑", desc: "乾濕雙重防滑紋理，出汗依然穩固抓地不位移。" },
+              { tag: "Cushion", title: "回彈減震", desc: "高密度微發泡結構，深層緩衝關節著地壓力。" },
+              { tag: "Clean", title: "無毒無味", desc: "通過環保安全檢測，拆封即可安心親膚接觸。" }
+            ],
+            storyHeroTag: "PURE ESSENTIALS",
+            storyHeroTitle: "專注細節，承托每一次身心對話",
+            storyHeroDesc: "穩固踏實的支撐，讓浮躁的心沉澱回到呼吸。每一次站立與平衡，都是身心專注的優雅體現。",
+            closingTitle: "回歸寧靜，在每一次呼吸中扎根",
+            closingDesc: "以極致抓地力與緩衝回彈，為身心練習鋪設最安定的起點。沉浸當下，感受由內而生的力量。"
+          }
+        ],
+        specs: "適合場景: 各流派瑜珈、皮拉提斯、伸展輔具\n材質檢驗: 環保無毒無異味\n清潔方式: 濕布輕柔擦拭陰乾",
+        sizeMetrics: [
+          { name: "規格/尺寸", s: "標準 183*68cm", m: "-", l: "-" },
+          { name: "厚度", s: "5mm 緩震", m: "-", l: "-" },
+          { name: "重量", s: "約 2.8 kg", m: "-", l: "-" }
+        ]
+      }
+    };
+
+    let currentSloganIndex = 0;
+
+    // 當品類改變時，重新構建設計風格下拉選單
+    function onCategoryChange() {
+      const cat = document.getElementById("productCategory").value;
+      const tpl = categoryTemplates[cat];
+      if (!tpl) return;
+
+      const styleSelect = document.getElementById("designStyle");
+      styleSelect.innerHTML = "";
+      tpl.styles.forEach(st => {
+        const opt = document.createElement("option");
+        opt.value = st.id;
+        opt.textContent = st.name;
+        styleSelect.appendChild(opt);
+      });
+
+      // 檢查當前品名是否符合某個風格關鍵字，自動選取
+      matchStyleByProductName();
+
+      // 重新生成尺寸表 (完全動態欄位結構)
+      renderSizeTableInput(tpl.sizeColumns || ["S", "M", "L"], tpl.sizeMetrics);
+
+      document.getElementById("productSpecs").value = tpl.specs;
+      applyCurrentStyle();
+    }
+
+    // 動態渲染尺寸編輯器 (支援任意尺碼欄與測量指標列)
+    function renderSizeTableInput(columns, metrics) {
+      const thead = document.getElementById("sizeTableHeaders");
+      thead.innerHTML = "";
+
+      // 項目名稱欄
+      const thMetric = document.createElement("th");
+      thMetric.style.minWidth = "80px";
+      thMetric.innerHTML = `<input type="text" value="項目" class="th-metric-title" style="font-weight:600; text-align:center;">`;
+      thead.appendChild(thMetric);
+
+      // 各尺碼欄
+      columns.forEach((colName, cIdx) => {
+        const th = document.createElement("th");
+        th.style.minWidth = "70px";
+        th.innerHTML = `
+          <div class="th-header-wrap">
+            <input type="text" value="${colName}" class="th-col-name" placeholder="尺碼" oninput="generateAll()">
+            <button type="button" class="btn-col-del" title="刪除此尺碼欄" onclick="removeColumn(${cIdx + 1})">×</button>
+          </div>
+        `;
+        thead.appendChild(th);
+      });
+
+      // 操作按鈕欄
+      const thAction = document.createElement("th");
+      thAction.style.width = "30px";
+      thead.appendChild(thAction);
+
+      // 渲染指標列
+      const tbody = document.getElementById("sizeTableBody");
+      tbody.innerHTML = "";
+      metrics.forEach(m => {
+        const tr = document.createElement("tr");
+        let tds = `<td><input type="text" value="${m.name}" class="col-metric" oninput="generateAll()"></td>`;
+        columns.forEach(colKey => {
+          const keyLower = colKey.toLowerCase();
+          const val = m[keyLower] !== undefined ? m[keyLower] : (m.values && m.values[colKey] !== undefined ? m.values[colKey] : "-");
+          tds += `<td><input type="text" value="${val}" class="col-val" oninput="generateAll()"></td>`;
+        });
+        tds += `<td><button type="button" class="btn-row-action" title="刪除此行" onclick="removeRow(this)">×</button></td>`;
+        tr.innerHTML = tds;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 新增尺碼欄位 (例如 XL / 2XL / 特殊碼)
+    function addColumn() {
+      const thead = document.getElementById("sizeTableHeaders");
+      const ths = thead.querySelectorAll("th");
+      const colIndex = ths.length - 1; // 插入在操作欄之前
+
+      const newTh = document.createElement("th");
+      newTh.style.minWidth = "70px";
+      newTh.innerHTML = `
+        <div class="th-header-wrap">
+          <input type="text" value="XL" class="th-col-name" placeholder="尺碼" oninput="generateAll()">
+          <button type="button" class="btn-col-del" title="刪除此尺碼欄" onclick="removeColumn(${colIndex})">×</button>
+        </div>
+      `;
+      thead.insertBefore(newTh, ths[colIndex]);
+
+      // 為每一行 tbody 補上對應 td
+      const tbody = document.getElementById("sizeTableBody");
+      tbody.querySelectorAll("tr").forEach(tr => {
+        const tds = tr.querySelectorAll("td");
+        const newTd = document.createElement("td");
+        newTd.innerHTML = `<input type="text" value="-" class="col-val" oninput="generateAll()">`;
+        tr.insertBefore(newTd, tds[colIndex]);
+      });
+
+      // 重新整理各欄刪除按鈕索引
+      refreshColDeleteIndices();
+      generateAll();
+    }
+
+    // 刪除指定尺碼欄
+    function removeColumn(colIndex) {
+      const thead = document.getElementById("sizeTableHeaders");
+      const ths = thead.querySelectorAll("th");
+      if (ths.length <= 3) {
+        alert("至少保留一個尺碼欄位！");
+        return;
+      }
+      ths[colIndex].remove();
+
+      const tbody = document.getElementById("sizeTableBody");
+      tbody.querySelectorAll("tr").forEach(tr => {
+        const tds = tr.querySelectorAll("td");
+        if (tds[colIndex]) tds[colIndex].remove();
+      });
+
+      refreshColDeleteIndices();
+      generateAll();
+    }
+
+    function refreshColDeleteIndices() {
+      const thead = document.getElementById("sizeTableHeaders");
+      const ths = thead.querySelectorAll("th");
+      ths.forEach((th, idx) => {
+        const btn = th.querySelector(".btn-col-del");
+        if (btn) {
+          btn.setAttribute("onclick", `removeColumn(${idx})`);
+        }
+      });
+    }
+
+    // 新增測量指標列 (例如: 大腿圍、袖長、腰圍)
+    function addMetricRow() {
+      const thead = document.getElementById("sizeTableHeaders");
+      const colCount = thead.querySelectorAll("th").length - 2; // 扣除項目欄與刪除按鈕欄
+
+      const tbody = document.getElementById("sizeTableBody");
+      const tr = document.createElement("tr");
+      let tds = `<td><input type="text" value="新測量指標" class="col-metric" oninput="generateAll()"></td>`;
+      for (let i = 0; i < colCount; i++) {
+        tds += `<td><input type="text" value="-" class="col-val" oninput="generateAll()"></td>`;
+      }
+      tds += `<td><button type="button" class="btn-row-action" title="刪除此行" onclick="removeRow(this)">×</button></td>`;
+      tr.innerHTML = tds;
+      tbody.appendChild(tr);
+      generateAll();
+    }
+
+    function removeRow(btn) {
+      const tr = btn.closest("tr");
+      if (tr) {
+        tr.remove();
+        generateAll();
+      }
+    }
+
+    // 當使用者在「商品名稱」輸入時，即時智慧辨識關鍵字並切換風格與文案
+    function onProductNameInput() {
+      matchStyleByProductName();
+      applyCurrentStyle();
+    }
+
+    function matchStyleByProductName() {
+      const name = document.getElementById("productName").value.toLowerCase();
+      const cat = document.getElementById("productCategory").value;
+      const tpl = categoryTemplates[cat];
+      if (!tpl) return;
+
+      const styleSelect = document.getElementById("designStyle");
+      // 依關鍵字匹配最佳 style
+      let matchedStyleId = tpl.styles[0].id;
+      for (const st of tpl.styles) {
+        if (st.keywords && st.keywords.some(kw => name.includes(kw.toLowerCase()))) {
+          matchedStyleId = st.id;
+          break;
+        }
+      }
+      styleSelect.value = matchedStyleId;
+    }
+
+    function onStyleChange() {
+      currentSloganIndex = 0;
+      applyCurrentStyle();
+    }
+
+    function applyCurrentStyle() {
+      const cat = document.getElementById("productCategory").value;
+      const tpl = categoryTemplates[cat];
+      if (!tpl) return;
+
+      const styleId = document.getElementById("designStyle").value;
+      const curStyle = tpl.styles.find(s => s.id === styleId) || tpl.styles[0];
+
+      // 套用文案
+      const slogans = curStyle.slogans || [];
+      const slogan = slogans[currentSloganIndex % slogans.length] || "";
+      document.getElementById("productSlogan").value = slogan;
+
+      // 套用三宮格卡片
+      if (curStyle.cards && curStyle.cards.length >= 3) {
+        document.getElementById("cardTag1").value = curStyle.cards[0].tag;
+        document.getElementById("cardTitle1").value = curStyle.cards[0].title;
+        document.getElementById("cardDesc1").value = curStyle.cards[0].desc;
+
+        document.getElementById("cardTag2").value = curStyle.cards[1].tag;
+        document.getElementById("cardTitle2").value = curStyle.cards[1].title;
+        document.getElementById("cardDesc2").value = curStyle.cards[1].desc;
+
+        document.getElementById("cardTag3").value = curStyle.cards[2].tag;
+        document.getElementById("cardTitle3").value = curStyle.cards[2].title;
+        document.getElementById("cardDesc3").value = curStyle.cards[2].desc;
+      }
+
+      generateAll();
+    }
+
+    // 點擊「🔄 換一句」文案按鈕
+    function regenerateSlogan() {
+      const cat = document.getElementById("productCategory").value;
+      const tpl = categoryTemplates[cat];
+      if (!tpl) return;
+      const styleId = document.getElementById("designStyle").value;
+      const curStyle = tpl.styles.find(s => s.id === styleId) || tpl.styles[0];
+      const slogans = curStyle.slogans || [];
+      if (slogans.length > 0) {
+        currentSloganIndex = (currentSloganIndex + 1) % slogans.length;
+        document.getElementById("productSlogan").value = slogans[currentSloganIndex];
+        generateAll();
+      }
+    }
+
+    function addImageField() {
+      const container = document.getElementById("imageInputsContainer");
+      const div = document.createElement("div");
+      div.className = "form-group";
+      div.style.marginBottom = "8px";
+      div.innerHTML = `<input type="text" class="form-control image-url-input" placeholder="圖片網址" oninput="generateAll()">`;
+      container.appendChild(div);
+    }
+
+    function switchView(mode) {
+      const box = document.getElementById("liveRenderContainer");
+      const btns = document.querySelectorAll(".preview-viewport-toggle button");
+      btns.forEach(b => b.classList.remove("active"));
+      if (mode === 'desktop') {
+        box.classList.remove("mobile-view");
+        box.classList.add("desktop-view");
+        btns[0].classList.add("active");
+      } else {
+        box.classList.remove("desktop-view");
+        box.classList.add("mobile-view");
+        btns[1].classList.add("active");
+      }
+    }
+
+    function generateAll() {
+      const cat = document.getElementById("productCategory").value;
+      const tpl = categoryTemplates[cat] || categoryTemplates.sports_bra;
+      const prodName = document.getElementById("productName").value.trim() || "雲感斜肩運動內衣";
+      const slogan = document.getElementById("productSlogan").value.trim();
+
+      // 三宮格卡片數據
+      const card1 = { tag: document.getElementById("cardTag1").value.trim(), title: document.getElementById("cardTitle1").value.trim(), desc: document.getElementById("cardDesc1").value.trim() };
+      const card2 = { tag: document.getElementById("cardTag2").value.trim(), title: document.getElementById("cardTitle2").value.trim(), desc: document.getElementById("cardDesc2").value.trim() };
+      const card3 = { tag: document.getElementById("cardTag3").value.trim(), title: document.getElementById("cardTitle3").value.trim(), desc: document.getElementById("cardDesc3").value.trim() };
+
+      // 商品資訊規格
+      const rawSpecs = document.getElementById("productSpecs").value.trim().split("\n").filter(x => x.trim().length > 0);
+
+      // 動態提取尺寸表數據 (支援任意欄位與自訂標題)
+      const thMetricInput = document.querySelector(".th-metric-title");
+      const metricLabel = thMetricInput ? thMetricInput.value.trim() : "尺寸";
+
+      const colHeaders = [];
+      document.querySelectorAll("#sizeTableHeaders .th-col-name").forEach(inp => {
+        colHeaders.push(inp.value.trim() || "-");
+      });
+
+      const sizeRows = [];
+      document.querySelectorAll("#sizeTableBody tr").forEach(tr => {
+        const metricInp = tr.querySelector(".col-metric");
+        const metricName = metricInp ? metricInp.value.trim() : "-";
+        const vals = [];
+        tr.querySelectorAll(".col-val").forEach(inp => {
+          vals.push(inp.value.trim());
+        });
+        sizeRows.push({ metric: metricName, vals });
+      });
+
+      // 提取圖片
+      const images = [];
+      document.querySelectorAll(".image-url-input").forEach(inp => {
+        const u = inp.value.trim();
+        if (u) images.push(u);
+      });
+
+      // ==========================================
+      // 1. 生成【欄位 1：商品特性】100% 官網原版排版 HTML
+      // ==========================================
+      let featHtml = `<div style="max-width: 760px; margin: 48px auto; padding: 0 20px; font-family: 'Noto Sans TC','PingFang TC','Microsoft JhengHei',Arial,sans-serif; color: #252525; box-sizing: border-box;">\n`;
+      
+      // 第一部分：大白色卡片 (頂部標題 + 三宮格 + 商品資訊)
+      featHtml += `<section style="padding: 44px 34px; background: #FFFFFF; border: 1px solid #E7DED4; box-sizing: border-box;">\n`;
+      featHtml += `<div style="text-align: center; margin-bottom: 30px;">\n`;
+      featHtml += `<p style="margin: 0 0 12px; color: #8e9b8a; font-size: 12px; letter-spacing: .16em; text-transform: uppercase;">BEAUTIFLY WEAR</p>\n`;
+      featHtml += `<h2 style="margin: 0 0 16px; font-family: 'Noto Serif TC','Noto Sans TC',serif; color: #252525; font-size: 28px; font-weight: 500; letter-spacing: .08em; line-height: 1.35;">${prodName}</h2>\n`;
+      featHtml += `<p style="max-width: 560px; margin: 0 auto; color: #746d66; font-size: 15px; line-height: 1.9;">${slogan}</p>\n`;
+      featHtml += `</div>\n`;
+      featHtml += `<div style="height: 1px; width: 56px; background: #8E9B8A; margin: 0 auto 34px;"><br /></div>\n`;
+      
+      // 三宮格卡片
+      featHtml += `<div style="display: grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 18px; margin-bottom: 34px;">\n`;
+      [card1, card2, card3].forEach(c => {
+        featHtml += `<div style="padding: 22px 20px; background: #FBF8F4; border: 1px solid #EFE8E0;">\n`;
+        featHtml += `<p style="margin: 0 0 8px; color: #9a7b52; font-size: 12px; letter-spacing: .12em; text-transform: uppercase;">${c.tag}</p>\n`;
+        featHtml += `<h3 style="margin: 0 0 8px; color: #252525; font-size: 17px; font-weight: 500; letter-spacing: .04em;">${c.title}</h3>\n`;
+        featHtml += `<p style="margin: 0; color: #746d66; font-size: 14px; line-height: 1.8;">${c.desc}</p>\n`;
+        featHtml += `</div>\n`;
+      });
+      featHtml += `</div>\n`;
+
+      // 商品資訊對齊列表
+      featHtml += `<div style="padding: 24px 0; border-top: 1px solid #E7DED4; border-bottom: 1px solid #E7DED4;">\n`;
+      featHtml += `<h3 style="margin: 0 0 16px; font-family: 'Noto Serif TC','Noto Sans TC',serif; color: #252525; font-size: 18px; font-weight: 500; letter-spacing: .08em;">商品資訊</h3>\n`;
+      featHtml += `<ul style="list-style: none; padding: 0; margin: 0; color: #746d66; font-size: 14px; line-height: 2;">\n`;
+      rawSpecs.forEach(line => {
+        const parts = line.split(":");
+        const label = parts[0] ? parts[0].trim() : "";
+        const val = parts.slice(1).join(":").trim();
+        featHtml += `<li><span style="display: inline-block; min-width: 88px; color: #252525;">${label}</span>${val}</li>\n`;
+      });
+      featHtml += `</ul>\n`;
+      featHtml += `</div>\n`;
+      featHtml += `</section>\n`;
+
+      // 第二部分：尺寸參考卡片 (SIZE OPTION) - 支援全自由編輯欄位與動態寬度
+      featHtml += `<section style="margin-top: 28px; padding: 38px 34px; background: #FFFFFF; border: 1px solid #E7DED4; box-sizing: border-box;">\n`;
+      featHtml += `<div style="text-align: center; margin-bottom: 24px;">\n`;
+      featHtml += `<p style="margin: 0 0 10px; color: #8e9b8a; font-size: 12px; letter-spacing: .16em; text-transform: uppercase;">SIZE OPTION</p>\n`;
+      featHtml += `<h2 style="margin: 0; font-family: 'Noto Serif TC','Noto Sans TC',serif; color: #252525; font-size: 22px; font-weight: 500; letter-spacing: .08em;">尺寸參考</h2>\n`;
+      featHtml += `</div>\n`;
+      featHtml += `<div style="overflow-x: auto; border: 1px solid #E7DED4;">\n`;
+      featHtml += `<table style="width: 100%; min-width: 430px; border-collapse: collapse; background: #FFFFFF; text-align: center; font-size: 14px;">\n`;
+      featHtml += `<thead>\n<tr style="background: #FBF8F4;">\n`;
+      featHtml += `<th style="padding: 14px; border-bottom: 1px solid #E7DED4; color: #6b5e54; font-weight: 500;">${metricLabel}</th>\n`;
+      colHeaders.forEach(col => {
+        featHtml += `<th style="padding: 14px; border-bottom: 1px solid #E7DED4; color: #6b5e54; font-weight: 500;">${col}</th>\n`;
+      });
+      featHtml += `</tr>\n</thead>\n<tbody>\n`;
+      sizeRows.forEach((r, idx) => {
+        const isLast = idx === sizeRows.length - 1;
+        const bStyle = isLast ? '' : ' border-bottom: 1px solid #E7DED4;';
+        featHtml += `<tr>\n`;
+        featHtml += `<td style="padding: 14px;${bStyle} color: #6b5e54; font-weight: 500; background: #FBF8F4;">${r.metric}</td>\n`;
+        r.vals.forEach(v => {
+          featHtml += `<td style="padding: 14px;${bStyle} color: #555555;">${v}</td>\n`;
+        });
+        featHtml += `</tr>\n`;
+      });
+      featHtml += `</tbody>\n</table>\n</div>\n`;
+      featHtml += `<p style="margin: 18px 0 0; color: #746d66; font-size: 13px; line-height: 1.8; text-align: center;">尺寸皆為平放手工測量，誤差 1-3cm 屬正常範圍。若介於兩個尺寸之間，偏好包覆感可選小一號，偏好舒適感可選大一號。</p>\n`;
+      featHtml += `</section>\n`;
+
+      // 第三部分：保養與出貨 (至此結束) - 官網原版米杏雙欄卡片
+      featHtml += `<section style="margin-top: 28px; padding: 34px; background: #F4F0EA; border: 1px solid #E7DED4; box-sizing: border-box;">\n`;
+      featHtml += `<h2 style="margin: 0 0 18px; font-family: 'Noto Serif TC','Noto Sans TC',serif; color: #252525; font-size: 21px; font-weight: 500; letter-spacing: .08em; text-align: center;">保養與出貨</h2>\n`;
+      featHtml += `<div style="display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 18px; color: #746d66; font-size: 14px; line-height: 1.85;">\n`;
+      featHtml += `<div>\n<h3 style="margin: 0 0 8px; color: #252525; font-size: 15px; font-weight: 500; letter-spacing: .06em;">洗滌建議</h3>\n`;
+      featHtml += `<p style="margin: 0;">建議裝入洗衣袋後低溫柔洗，避免烘乾、漂白與長時間浸泡，以維持彈性與布料觸感。</p>\n</div>\n`;
+      featHtml += `<div>\n<h3 style="margin: 0 0 8px; color: #252525; font-size: 15px; font-weight: 500; letter-spacing: .06em;">預購說明</h3>\n`;
+      featHtml += `<p style="margin: 0;">若商品標示為預購，約需 7-14 個工作天安排出貨。實際時間請以商品頁與訂單通知為準。</p>\n</div>\n`;
+      featHtml += `</div>\n</section>\n`;
+      featHtml += `</div>`;
+
+      // ==========================================
+      // 2. 生成【欄位 2：商品內文】HTML (直式圖片防變形排版)
+      // ==========================================
+      let storyHtml = `<div style="max-width: 760px; margin: 0 auto; padding: 0 20px; font-family: 'Noto Sans TC','PingFang TC','Microsoft JhengHei',Arial,sans-serif; color: #252525; line-height: 1.85; box-sizing: border-box; text-align: left;">\n`;
+
+      // 主圖 1 (防拉伸)
+      if (images.length > 0) {
+        storyHtml += `<img style="display: block; width: 100%; max-width: 700px; height: auto; margin: 0 auto 36px; border: 0;" src="${images[0]}" alt="${prodName} 形象主圖" />\n`;
+      }
+
+      // 取得當前選中的風格物件
+      const styleId = document.getElementById("designStyle") ? document.getElementById("designStyle").value : "";
+      const curStyle = (tpl.styles && tpl.styles.find(s => s.id === styleId)) || (tpl.styles && tpl.styles[0]) || {};
+
+      const storyTag = curStyle.storyHeroTag || tpl.storyHeroTag || "FABRIC DETAIL";
+      const storyTitle = curStyle.storyHeroTitle || tpl.storyHeroTitle || "高彈速乾裸感面料";
+      const storyDesc = curStyle.storyHeroDesc || tpl.storyHeroDesc || "柔軟貼膚的高彈面料，帶來輕盈包覆與自在延展。練習時不易悶熱，日常穿搭也能維持俐落線條，適合瑜珈、皮拉提斯、伸展與輕度訓練。";
+      const closingTitle = curStyle.closingTitle || "一件，從練習到生活";
+      const closingDesc = curStyle.closingDesc || "讓運動服飾不只存在於練習時刻，也能成為日常穿搭的一部分。舒適、修飾、好活動，是 BEAUTIFLY 對每一件單品的基本要求。";
+
+      // 故事引言卡片 (FABRIC DETAIL / 依風格動態呈現)
+      storyHtml += `<section style="padding: 44px 34px; background: #FFFFFF; border: 1px solid #E7DED4; box-sizing: border-box; margin-bottom: 28px;">\n`;
+      storyHtml += `<div style="text-align: center; margin-bottom: 28px;">\n`;
+      storyHtml += `<p style="margin: 0 0 12px; color: #8e9b8a; font-size: 12px; letter-spacing: .16em; text-transform: uppercase;">${storyTag}</p>\n`;
+      storyHtml += `<h2 style="margin: 0 0 16px; font-family: 'Noto Serif TC','Noto Sans TC',serif; color: #252525; font-size: 26px; font-weight: 500; letter-spacing: .08em; line-height: 1.35;">${storyTitle}</h2>\n`;
+      storyHtml += `<div style="width: 56px; height: 1px; background: #8E9B8A; margin: 0 auto;"><br /></div>\n`;
+      storyHtml += `</div>\n`;
+      storyHtml += `<p style="max-width: 600px; margin: 0 auto; color: #746d66; font-size: 15px; line-height: 1.95; text-align: center;">${storyDesc}</p>\n`;
+      storyHtml += `</section>\n`;
+
+      // 細節圖片 2 & 3
+      if (images.length > 1) {
+        storyHtml += `<img style="display: block; width: 100%; max-width: 700px; height: auto; margin: 0 auto 36px; border: 0;" src="${images[1]}" alt="${prodName} 細節 1" />\n`;
+      }
+      if (images.length > 2) {
+        storyHtml += `<img style="display: block; width: 100%; max-width: 700px; height: auto; margin: 0 auto 36px; border: 0;" src="${images[2]}" alt="${prodName} 細節 2" />\n`;
+      }
+
+      // 品牌結語卡片 (BEAUTIFLY DAILY PRACTICE / 依風格與品類動態客製)
+      storyHtml += `<section style="padding: 38px 34px; background: #FFFFFF; border: 1px solid #E7DED4; box-sizing: border-box; text-align: center; margin-bottom: 36px;">\n`;
+      storyHtml += `<p style="margin: 0 0 12px; color: #9a7b52; font-size: 12px; letter-spacing: .16em; text-transform: uppercase;">BEAUTIFLY DAILY PRACTICE</p>\n`;
+      storyHtml += `<h2 style="margin: 0 0 16px; font-family: 'Noto Serif TC','Noto Sans TC',serif; color: #252525; font-size: 23px; font-weight: 500; letter-spacing: .08em;">${closingTitle}</h2>\n`;
+      storyHtml += `<p style="max-width: 560px; margin: 0 auto; color: #746d66; font-size: 15px; line-height: 1.95;">${closingDesc}</p>\n`;
+      storyHtml += `</section>\n`;
+
+      // 額外細節圖片 (若有第 4 張以上)
+      if (images.length > 3) {
+        for (let i = 3; i < images.length; i++) {
+          storyHtml += `<img style="display: block; width: 100%; max-width: 700px; height: auto; margin: 0 auto 36px; border: 0;" src="${images[i]}" alt="${prodName} 細節 ${i}" />\n`;
+        }
+      }
+
+      storyHtml += `</div>`;
+
+      // 更新代碼區
+      document.getElementById("featureCodeArea").value = featHtml;
+      document.getElementById("storyCodeArea").value = storyHtml;
+
+      // 即時渲染預覽
+      const liveContainer = document.getElementById("liveRenderContainer");
+      liveContainer.innerHTML = `
+        <div style="margin-bottom: 30px; border-bottom: 2px dashed #E7DED4; padding-bottom: 25px;">
+          <div style="font-size: 13px; font-weight: 600; color: #8E9B8A; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .1em;">▼ [預覽] 欄位 1：商品特性 (官網 100% 精準同款)</div>
+          ${featHtml}
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #8E9B8A; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .1em;">▼ [預覽] 欄位 2：商品內文 (直式防拉伸圖文)</div>
+          ${storyHtml}
+        </div>
+      `;
+    }
+
+    function copyCode(elementId, btn) {
+      const copyText = document.getElementById(elementId);
+      copyText.select();
+      copyText.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(copyText.value).then(() => {
+        const origText = btn.textContent;
+        btn.textContent = "已複製！";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = origText;
+          btn.classList.remove("copied");
+        }, 2000);
+      });
+    }
+
+    // 初始化執行一次
+    window.onload = function() {
+      onCategoryChange();
+    };
+  </script>
+</body>
+</html>
