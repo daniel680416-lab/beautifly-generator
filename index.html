@@ -218,7 +218,49 @@
       border-radius: 2px;
       transition: color 0.15s;
     }
-    .btn-col-del:hover { color: #d9534f; }
+    .th-metric-title {
+      border: 1px dashed #d0c5b8 !important;
+      background: #FFFFFF !important;
+      border-radius: 3px;
+      font-weight: 600;
+      color: var(--bf-charcoal);
+      cursor: text;
+    }
+    .th-metric-title:focus {
+      border-color: var(--bf-taupe) !important;
+      border-style: solid !important;
+      background: #FFFFFF !important;
+    }
+
+    .th-col-name {
+      border: 1px dashed #d0c5b8 !important;
+      background: #FFFFFF !important;
+      border-radius: 3px;
+    }
+    .th-col-name:focus {
+      border-color: var(--bf-taupe) !important;
+      border-style: solid !important;
+      background: #FFFFFF !important;
+    }
+
+    .btn-add-col-th {
+      background: var(--bf-sage);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 7px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .btn-add-col-th:hover {
+      opacity: 0.85;
+    }
 
     .btn-row-action {
       background: none;
@@ -925,10 +967,10 @@
       const thead = document.getElementById("sizeTableHeaders");
       thead.innerHTML = "";
 
-      // 項目名稱欄
+      // 項目名稱欄 (完全可自行修改標題名稱)
       const thMetric = document.createElement("th");
-      thMetric.style.minWidth = "80px";
-      thMetric.innerHTML = `<input type="text" value="項目" class="th-metric-title" style="font-weight:600; text-align:center;">`;
+      thMetric.style.minWidth = "84px";
+      thMetric.innerHTML = `<input type="text" value="項目" class="th-metric-title" placeholder="標題名稱" title="點擊修改表頭名稱 (例如: 尺寸、部位)" oninput="generateAll()">`;
       thead.appendChild(thMetric);
 
       // 各尺碼欄
@@ -944,9 +986,11 @@
         thead.appendChild(th);
       });
 
-      // 操作按鈕欄
+      // 最右側：新增欄位按鈕欄 (直接在表格最右側點擊新增)
       const thAction = document.createElement("th");
-      thAction.style.width = "30px";
+      thAction.style.width = "40px";
+      thAction.style.textAlign = "center";
+      thAction.innerHTML = `<button type="button" class="btn-add-col-th" title="在最右側新增尺碼欄位" onclick="addColumn()">+ 欄</button>`;
       thead.appendChild(thAction);
 
       // 渲染指標列
